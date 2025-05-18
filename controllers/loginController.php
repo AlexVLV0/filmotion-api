@@ -1,19 +1,29 @@
 <?php
 include_once '../models/usuarioModel.php';
-require_once '../vendor/autoload.php';  // Asegúrate de que la librería esté cargada
+require_once '../vendor/autoload.php';
 
 use \Firebase\JWT\JWT;
 
-// Función para manejar el login
 function loginUsuario($email, $password) {
-    $usuario = obtenerUsuarioPorEmail($email);  // Buscar al usuario en la base de datos
+    $usuario = obtenerUsuarioPorEmail($email);  
 
     if ($usuario) {
-        // Verificar la contraseña utilizando password_verify
         if (password_verify($password, $usuario['password'])) {
+            $clave_secreta = "tu_clave_secreta_segura";
+            $payload = [
+                'iat' => time(),
+                'exp' => time() + (60 * 60 * 24),
+                'data' => [
+                    'user_id' => $usuario['id'],
+                    'email' => $usuario['email']
+                ]
+            ];
+            $jwt = JWT::encode($payload, $clave_secreta, 'HS256');
+
             return [
                 'status' => 'success',
                 'message' => 'Login exitoso',
+                'token' => $jwt,
                 'user_id' => $usuario['id'],
                 'email' => $usuario['email']
             ];
@@ -31,19 +41,18 @@ function loginUsuario($email, $password) {
     }
 }
 
+
 function validarEmail($email) {
-    // Verificar si el formato del correo es válido
     if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        return true;  // El formato del correo es válido
+        return true;  
     } else {
-        return false; // El formato del correo es inválido
+        return false; 
     }
 }
 
 function registerUsuario($email, $password) {
     $mysqli = getDbConnection();
     
-    // Validar el formato del correo electrónico
     if (!validarEmail($email)) {
         return [
             'status' => 'error',
@@ -51,7 +60,6 @@ function registerUsuario($email, $password) {
         ];
     }
 
-    // Verificar si el usuario ya existe
     $stmt = $mysqli->prepare("SELECT id FROM usuarios WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -64,10 +72,8 @@ function registerUsuario($email, $password) {
         ];
     }
 
-    // Hashear la contraseña antes de guardarla
     $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
-    // Insertar el nuevo usuario
     $stmt = $mysqli->prepare("INSERT INTO usuarios (email, password_hash) VALUES (?, ?)");
     $stmt->bind_param("ss", $email, $passwordHash);
     if ($stmt->execute()) {

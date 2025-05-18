@@ -2,11 +2,10 @@
 // peliculasController.php
 include_once '../models/peliculaModel.php';
 include_once '../utils/tmdbUtils.php';
-set_time_limit(0); // 0 significa tiempo ilimitado
+set_time_limit(0); 
 
-// Obtener las películas desde TMDb y guardarlas en la base de datos
 function obtenerYGuardarPeliculas() {
-    set_time_limit(0); // Sin límite de tiempo de ejecución
+    set_time_limit(0); 
 
     $endpoints = ['popular', 'top_rated', 'now_playing', 'upcoming'];
     $max_paginas = 500;
@@ -29,7 +28,6 @@ function obtenerYGuardarPeliculas() {
 }
 
 
-// Obtener las películas almacenadas en la base de datos
 function obtenerPeliculasBBDD() {
     return obtenerPeliculas();
 }

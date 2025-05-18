@@ -14,7 +14,6 @@ function guardarPeliculasEnBBDD($peliculas) {
         $duracion = isset($pelicula['runtime']) ? $pelicula['runtime'] : 0;
         $genero = isset($pelicula['genres'][0]['name']) ? $pelicula['genres'][0]['name'] : '';
 
-        // Usamos INSERT IGNORE para evitar duplicados
         $stmt = $mysqli->prepare("INSERT IGNORE INTO peliculas (tmdb_id, titulo, descripcion, fecha_lanzamiento, imagen_url, duracion, genero) VALUES (?, ?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("issssss", $tmdb_id, $titulo, $descripcion, $fecha_lanzamiento, $imagen_url, $duracion, $genero);
         $stmt->execute();
@@ -39,4 +38,25 @@ function obtenerPeliculas() {
 
     return $peliculas;
 }
+
+function buscarPeliculasPorTitulo($query) {
+    $mysqli = getDbConnection();
+    $query = "%$query%";
+    
+    $stmt = $mysqli->prepare("SELECT * FROM peliculas WHERE titulo LIKE ?");
+    $stmt->bind_param("s", $query);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $peliculas = [];
+    while ($row = $result->fetch_assoc()) {
+        $peliculas[] = $row;
+    }
+
+    $stmt->close();
+    $mysqli->close();
+
+    return $peliculas;
+}
+
 ?>

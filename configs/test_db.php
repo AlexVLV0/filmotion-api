@@ -1,7 +1,7 @@
 <?php
-require_once 'db_config.php'; // Incluye la configuración de la base de datos
+require_once 'db_config.php';
 
-$mysqli = getDbConnection(); // Llama a tu función
+$mysqli = getDbConnection();
 
 if ($mysqli) {
     echo "Conexión exitosa a la base de datos.";

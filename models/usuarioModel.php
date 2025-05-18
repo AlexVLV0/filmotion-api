@@ -1,10 +1,8 @@
 <?php
 include_once '../configs/db_config.php';
 
-// Función para buscar un usuario por su email
 function obtenerUsuarioPorEmail($email) {
-    $mysqli = getDbConnection(); // Conexión a la base de datos
-
+    $mysqli = getDbConnection(); 
     $stmt = $mysqli->prepare("SELECT id, email, password_hash FROM usuarios WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
